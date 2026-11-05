@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Analyzer – Options</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <span class="brand">Music Analyzer</span>
+        <nav>
+            <a href="#information">Information</a>
+            <a href="index.html">Home</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h1>Your Summary <span class="badge" id="service-badge" hidden></span></h1>
+            <p class="sub">Pick how you want your listening data sorted and shown.</p>
+
+            <form class="options" id="options">
+                <div class="option">
+                    <label for="top-stats">Top Stats</label>
+                    <select id="top-stats" name="topStats">
+                        <option value="" disabled selected>Choose one</option>
+                        <option value="artists">Artists</option>
+                        <option value="songs">Songs</option>
+                        <option value="genre">Genre</option>
+                    </select>
+                </div>
+
+                <div class="option">
+                    <label for="time-period">Time Period</label>
+                    <select id="time-period" name="timePeriod">
+                        <option value="" disabled selected>Choose one</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                        <option value="6months">6 Months</option>
+                        <option value="year">Year</option>
+                    </select>
+                </div>
+
+                <div class="option">
+                    <label for="summary-length">Summary Length</label>
+                    <select id="summary-length" name="summaryLength">
+                        <option value="" disabled selected>Choose one</option>
+                        <option value="10">Top 10</option>
+                        <option value="25">Top 25</option>
+                        <option value="50">Top 50</option>
+                        <option value="100">Top 100</option>
+                    </select>
+                </div>
+
+                <div class="option">
+                    <label for="summary-style">Summary Style</label>
+                    <select id="summary-style" name="summaryStyle">
+                        <option value="" disabled selected>Choose one</option>
+                        <option value="list">List</option>
+                        <option value="grid">Grid</option>
+                        <option value="receipt">Receipt</option>
+                        <option value="bubble">Bubble</option>
+                        <option value="cover">Cover</option>
+                    </select>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <span>SE 353 01 : Software Engineering</span>
+        <span>Group : Sego, Upton, Fisher</span>
+    </footer>
+
+    <script>
+        // Show which streaming service was chosen on the main page.
+        const service = new URLSearchParams(location.search).get('service');
+        const names = { spotify: 'Spotify', apple: 'Apple Music' };
+        if (names[service]) {
+            const badge = document.getElementById('service-badge');
+            badge.textContent = names[service];
+            badge.classList.add(service);
+            badge.hidden = false;
+        }
+    </script>
+</body>
+
+</html>
