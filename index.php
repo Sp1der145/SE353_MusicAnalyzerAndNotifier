@@ -10,6 +10,7 @@ $error = $errors[$_GET['error'] ?? ''] ?? null;
 $spotifyConnected = !empty($_SESSION['spotify']);
 $appleConnected   = !empty($_SESSION['apple_music']);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
