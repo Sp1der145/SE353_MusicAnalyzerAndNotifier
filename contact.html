@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Analyzer – Contact</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <span class="brand">Music Analyzer</span>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="stats.html">Information</a>
+            <a href="contact.html" aria-current="page">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h1>Contact Us</h1>
+            <p class="sub">Questions or feedback about the Music Analyzer and Notifier? Reach out to the team.</p>
+
+            <div class="team">
+                <div class="member">
+                    <strong>Griffin Sego</strong>
+                    <a href="mailto:crupton23@my.trine.edu">sego@example.edu</a>
+                </div>
+                <div class="member">
+                    <strong>Connor Upton</strong>
+                    <a href="mailto:gcsego23@my.trine.edu">upton@example.edu</a>
+                </div>
+                <div class="member">
+                    <strong>Josh Fisher</strong>
+                    <a href="mailto:jsfisher23@my.trine.edu">fisher@example.edu</a>
+                </div>
+            </div>
+
+            <form class="options contact-form" id="contact-form">
+                <div class="option">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="option">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="option full">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+
+                <div class="option full">
+                    <button type="submit">Send Message</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <span>SE 353 01 : Software Engineering</span>
+        <span>Group : Sego, Upton, Fisher</span>
+    </footer>
+
+    <script>
+        // No backend yet: open the user's mail app with the message filled in.
+        const TEAM_EMAIL = 'fisher@example.edu';
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const f = e.target;
+            const subject = `Music Analyzer feedback from ${f.name.value}`;
+            const body = `${f.message.value}\n\nReply to: ${f.email.value}`;
+            location.href = `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        });
+    </script>
+</body>
+
+</html>

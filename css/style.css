@@ -225,6 +225,75 @@ footer {
     vertical-align: middle;
 }
 
+/* Contact page */
+.team {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.member {
+    padding: 16px;
+    border: 1px solid #dde1e8;
+    border-radius: 8px;
+    background: #fafbfc;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.member a {
+    color: #4a7dff;
+    text-decoration: none;
+    font-size: .9rem;
+    overflow-wrap: anywhere;
+}
+
+.member a:hover {
+    text-decoration: underline;
+}
+
+.option.full {
+    grid-column: 1 / -1;
+}
+
+.option input,
+.option textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    border: 1px solid #c4cad4;
+    border-radius: 6px;
+    background: #fafbfc;
+}
+
+.option textarea {
+    resize: vertical;
+}
+
+.option input:focus,
+.option textarea:focus {
+    outline: 2px solid #4a7dff;
+    outline-offset: 1px;
+    border-color: #4a7dff;
+}
+
+.contact-form button {
+    padding: 10px 22px;
+    font: inherit;
+    font-weight: 600;
+    color: #fff;
+    background: #1f2430;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.contact-form button:hover {
+    background: #3b4458;
+}
+
 @media (max-width: 600px) {
     .topbar {
         padding: 0 16px;
