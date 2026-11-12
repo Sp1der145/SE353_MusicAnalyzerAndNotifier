@@ -1,0 +1,7 @@
+<?php
+return [
+    'client_id'     => 'PASTE_CLIENT_ID_HERE',
+    'client_secret' => 'PASTE_CLIENT_SECRET_HERE',
+    'redirect_uri'  => 'http://127.0.0.1/maan/callback.php',
+    'scope'         => 'user-top-read',
+];
