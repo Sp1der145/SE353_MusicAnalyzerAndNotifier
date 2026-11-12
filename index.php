@@ -7,7 +7,8 @@ $errors = [
     'token_failed'   => 'Could not connect. Please try again later.',
 ];
 $error = $errors[$_GET['error'] ?? ''] ?? null;
-$connected = !empty($_SESSION['access_token']);
+$spotifyConnected = !empty($_SESSION['spotify']);
+$appleConnected   = !empty($_SESSION['apple_music']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,8 +45,16 @@ $connected = !empty($_SESSION['access_token']);
       <p class="error"><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
 
-    <?php if ($connected): ?>
-      <p class="success">Connected to Spotify as <?= htmlspecialchars($_SESSION['display_name'] ?? 'Spotify user') ?></p>
+    <?php if ($spotifyConnected): ?>
+    <p class="success">
+        Spotify Connected
+    </p>
+    <?php endif; ?>
+
+    <?php if ($appleConnected): ?>
+    <p class="success">
+        Apple Music Connected
+    </p>
     <?php endif; ?>
 
     <a class="btn spotify" href="login.php">Continue with Spotify</a>

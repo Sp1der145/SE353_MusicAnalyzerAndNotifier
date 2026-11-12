@@ -40,9 +40,18 @@ if (empty($tokens['access_token'])) {
 }
 
 // Keep tokens in the session only
-$_SESSION['access_token']  = $tokens['access_token'];
-$_SESSION['refresh_token'] = $tokens['refresh_token'] ?? null;
-$_SESSION['expires_at']    = time() + $tokens['expires_in'];
+$_SESSION['spotify'] = [
+    'access_token' => $tokens['access_token'],
+    'refresh_token' => $tokens['refresh_token'] ?? null,
+    'expires_at' => time() + $tokens['expires_in'],
+    'display_name' => $me['display_name']
+];
+
+$_SESSION['apple_music'] = [
+    'developer_token' => $developerToken,
+    'music_user_token' => $musicUserToken,
+    'display_name' => $appleUserName
+];
 
 // Test the token: get the user's name
 $ch = curl_init('https://api.spotify.com/v1/me');
