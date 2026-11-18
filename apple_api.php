@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 function appleRequest($endpoint)
 {
     $config = require 'apple_config.php';
@@ -12,7 +14,8 @@ function appleRequest($endpoint)
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
             'Authorization: Bearer ' .
-            $config['developer_token'],
+            $_SESSION['apple_music']['developer_token'],
+
             'Music-User-Token: ' .
             $_SESSION['apple_music']['music_user_token']
         ]
@@ -22,4 +25,24 @@ function appleRequest($endpoint)
     curl_close($ch);
 
     return json_decode($response, true);
+}
+
+function getAppleTopSongs()
+{
+    return appleRequest('me/recent/played/tracks');
+}
+
+function getAppleLibrarySongs()
+{
+    return appleRequest('me/library/songs');
+}
+
+function getAppleLibraryAlbums()
+{
+    return appleRequest('me/library/albums');
+}
+
+function getAppleLibraryArtists()
+{
+    return appleRequest('me/library/artists');
 }

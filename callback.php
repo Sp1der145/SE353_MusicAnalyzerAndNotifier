@@ -39,6 +39,18 @@ if (empty($tokens['access_token'])) {
     exit;
 }
 
+// Test the token: get the user's name
+$ch = curl_init('https://api.spotify.com/v1/me');
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        'Authorization: Bearer ' . $tokens['access_token']
+    ],
+]);
+
+$me = json_decode(curl_exec($ch), true);
+curl_close($ch);
+
 // Keep tokens in the session only
 $_SESSION['spotify'] = [
     'access_token' => $tokens['access_token'],
@@ -47,20 +59,12 @@ $_SESSION['spotify'] = [
     'display_name' => $me['display_name']
 ];
 
-$_SESSION['apple_music'] = [
-    'developer_token' => $developerToken,
-    'music_user_token' => $musicUserToken,
-    'display_name' => $appleUserName
-];
-
-// Test the token: get the user's name
-$ch = curl_init('https://api.spotify.com/v1/me');
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $_SESSION['access_token']],
-]);
-$me = json_decode(curl_exec($ch), true);
-curl_close($ch);
+// TEMP COMMENTED OUT UNTIL APPLE MUSIC IS IMPLEMENTED
+// $_SESSION['apple_music'] = [
+//     'developer_token' => $developerToken,
+//     'music_user_token' => $musicUserToken,
+//     'display_name' => $appleUserName
+// ];
 
 $_SESSION['display_name'] = $me['display_name'] ?? 'Spotify user';
 
