@@ -1,0 +1,173 @@
+<?php
+
+const SPOTIFY_PERIODS = [
+    'week'    => 'Past week',
+    'month'   => 'Past month',
+    '6months' => 'Past 6 months',
+    'year'    => 'Past year',
+];
+
+const SPOTIFY_RANGES = [
+    'month'   => 'short_term',
+    '6months' => 'medium_term',
+    'year'    => 'long_term',
+];
+
+const SPOTIFY_LENGTHS = [10, 25, 50, 100];
+
+function spotify_refresh(array $config): bool
+{
+    if (empty($_SESSION['refresh_token'])) {
+        return false;
+    }
+
+    $ch = curl_init('https://accounts.spotify.com/api/token');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS     => http_build_query([
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $_SESSION['refresh_token'],
+        ]),
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Basic ' . base64_encode($config['client_id'] . ':' . $config['client_secret']),
+            'Content-Type: application/x-www-form-urlencoded',
+        ],
+    ]);
+    $tokens = json_decode((string) curl_exec($ch), true);
+    curl_close($ch);
+
+    if (empty($tokens['access_token'])) {
+        return false;
+    }
+
+    $_SESSION['access_token'] = $tokens['access_token'];
+    $_SESSION['expires_at']   = time() + ($tokens['expires_in'] ?? 3600);
+    if (!empty($tokens['refresh_token'])) {
+        $_SESSION['refresh_token'] = $tokens['refresh_token'];
+    }
+    return true;
+}
+
+function spotify_get(array $config, string $path, array $query = [], bool $retry = true): array
+{
+    if (time() >= ($_SESSION['expires_at'] ?? 0) - 60 && !spotify_refresh($config)) {
+        throw new RuntimeException('Spotify session expired', 401);
+    }
+
+    $url = 'https://api.spotify.com/v1/' . $path . ($query ? '?' . http_build_query($query) : '');
+    $ch  = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $_SESSION['access_token']],
+    ]);
+    $body   = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+
+    if ($status === 401 && $retry && spotify_refresh($config)) {
+        return spotify_get($config, $path, $query, false);
+    }
+    if ($status === 401) {
+        throw new RuntimeException('Spotify session expired', 401);
+    }
+    if ($status !== 200) {
+        throw new RuntimeException('Spotify request failed', $status);
+    }
+    return json_decode((string) $body, true) ?? [];
+}
+
+function spotify_image(array $images): ?string
+{
+    return $images ? end($images)['url'] : null;
+}
+
+function spotify_format_track(array $track, ?int $plays = null): array
+{
+    return [
+        'name'   => $track['name'] ?? 'Unknown song',
+        'detail' => implode(', ', array_column($track['artists'] ?? [], 'name')),
+        'image'  => spotify_image($track['album']['images'] ?? []),
+        'url'    => $track['external_urls']['spotify'] ?? null,
+        'plays'  => $plays,
+    ];
+}
+
+function spotify_format_artist(array $artist, ?int $plays = null): array
+{
+    return [
+        'name'   => $artist['name'] ?? 'Unknown artist',
+        'detail' => '',
+        'image'  => spotify_image($artist['images'] ?? []),
+        'url'    => $artist['external_urls']['spotify'] ?? null,
+        'plays'  => $plays,
+    ];
+}
+
+function spotify_top(array $config, string $type, string $range, int $count): array
+{
+    $endpoint = 'me/top/' . $type;
+    $first    = spotify_get($config, $endpoint, ['time_range' => $range, 'limit' => min(50, $count), 'offset' => 0]);
+    $items    = $first['items'] ?? [];
+
+    if ($count > 50 && count($items) === 50) {
+        $second = spotify_get($config, $endpoint, ['time_range' => $range, 'limit' => 50, 'offset' => 50]);
+        if (empty($second['items'])) {
+            $second = spotify_get($config, $endpoint, ['time_range' => $range, 'limit' => 50, 'offset' => 49]);
+        }
+        $seen = array_column($items, 'id');
+        foreach ($second['items'] ?? [] as $item) {
+            if (!in_array($item['id'], $seen, true)) {
+                $items[] = $item;
+                $seen[]  = $item['id'];
+            }
+        }
+    }
+
+    $format = $type === 'tracks' ? 'spotify_format_track' : 'spotify_format_artist';
+    return array_map($format, array_slice($items, 0, $count));
+}
+
+function spotify_week(array $config, int $count): array
+{
+    $data   = spotify_get($config, 'me/player/recently-played', ['limit' => 50]);
+    $cutoff = time() - 7 * 86400;
+    $tracks = [];
+    $artists = [];
+
+    foreach ($data['items'] ?? [] as $play) {
+        if (strtotime($play['played_at'] ?? '') < $cutoff || empty($play['track']['id'])) {
+            continue;
+        }
+        $track = $play['track'];
+        $tracks[$track['id']]['item']  = $track;
+        $tracks[$track['id']]['plays'] = ($tracks[$track['id']]['plays'] ?? 0) + 1;
+
+        foreach ($track['artists'] ?? [] as $artist) {
+            if (empty($artist['id'])) {
+                continue;
+            }
+            $artists[$artist['id']]['item']  = $artist;
+            $artists[$artist['id']]['plays'] = ($artists[$artist['id']]['plays'] ?? 0) + 1;
+        }
+    }
+
+    $byPlays = fn(array $a, array $b): int => $b['plays'] <=> $a['plays'];
+    usort($tracks, $byPlays);
+    usort($artists, $byPlays);
+
+    return [
+        'tracks'  => array_map(fn($t) => spotify_format_track($t['item'], $t['plays']), array_slice($tracks, 0, $count)),
+        'artists' => array_map(fn($a) => spotify_format_artist($a['item'], $a['plays']), array_slice($artists, 0, $count)),
+    ];
+}
+
+function spotify_forget(): void
+{
+    unset(
+        $_SESSION['access_token'],
+        $_SESSION['refresh_token'],
+        $_SESSION['expires_at'],
+        $_SESSION['display_name']
+    );
+}

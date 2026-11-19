@@ -5,12 +5,13 @@ $errors = [
     'access_denied'  => 'Authorization was cancelled.',
     'state_mismatch' => 'Login could not be verified. Please try again.',
     'token_failed'   => 'Could not connect. Please try again later.',
+    'session_expired' => 'Your Spotify session expired. Please connect again.',
 ];
 
 $error = $errors[$_GET['error'] ?? ''] ?? null;
-
 $spotifyConnected = !empty($_SESSION['spotify']);
 $appleConnected   = !empty($_SESSION['apple_music']);
+$loggedOut = isset($_GET['logged_out']);
 ?>
 
 <!DOCTYPE html>
@@ -24,10 +25,8 @@ $appleConnected   = !empty($_SESSION['apple_music']);
 </head>
 
 <body>
-
     <header class="topbar">
         <span class="brand">Music Analyzer</span>
-
         <nav>
             <a href="index.php" aria-current="page">Home</a>
             <a href="information.html">Information</a>
@@ -36,9 +35,7 @@ $appleConnected   = !empty($_SESSION['apple_music']);
     </header>
 
     <main>
-
         <section class="panel">
-
             <div class="title">
                 <h1>Music Analyzer and Notifier</h1>
                 <p>
@@ -65,20 +62,20 @@ $appleConnected   = !empty($_SESSION['apple_music']);
                 </p>
             <?php endif; ?>
 
-            <div class="services">
+            <?php if ($loggedOut): ?>
+                <p class="success">Disconnected. Your Spotify session data was cleared.</p>
+            <?php endif; ?>
 
+            <div class="services">
                 <a href="login.php"
                    class="service spotify"
                    style="--accent:#1DB954;">
 
                     <span class="dot"></span>
-
                     Spotify
-
                     <small>
                         Connect your Spotify account and view your top songs, artists, and albums.
                     </small>
-
                 </a>
 
                 <a href="apple_login.php"
@@ -86,24 +83,18 @@ $appleConnected   = !empty($_SESSION['apple_music']);
                    style="--accent:#FA243C;">
 
                     <span class="dot"></span>
-
                     Apple Music
-
                     <small>
                         Connect your Apple Music account and analyze your listening trends.
                     </small>
-
                 </a>
-
             </div>
 
             <p class="notice">
                 Your music data is used only for analysis and notification features.
                 <strong>No streaming service passwords are stored.</strong>
             </p>
-
         </section>
-
     </main>
 
     <footer>
@@ -112,5 +103,4 @@ $appleConnected   = !empty($_SESSION['apple_music']);
     </footer>
 
 </body>
-
 </html>
