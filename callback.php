@@ -51,6 +51,16 @@ curl_setopt_array($ch, [
 $me = json_decode(curl_exec($ch), true);
 curl_close($ch);
 
+// Save the user's email (requires the user-read-email scope)
+if (!empty($me['email'])) {
+    require_once 'db.php';
+    try {
+        saveUserEmail($me['email']);
+    } catch (PDOException $e) {
+        error_log('Could not save user email: ' . $e->getMessage());
+    }
+}
+
 // Keep tokens in the session only
 $_SESSION['spotify'] = [
     'access_token' => $tokens['access_token'],
