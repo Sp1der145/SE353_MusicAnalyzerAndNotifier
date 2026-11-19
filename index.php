@@ -6,60 +6,111 @@ $errors = [
     'state_mismatch' => 'Login could not be verified. Please try again.',
     'token_failed'   => 'Could not connect. Please try again later.',
 ];
+
 $error = $errors[$_GET['error'] ?? ''] ?? null;
+
 $spotifyConnected = !empty($_SESSION['spotify']);
 $appleConnected   = !empty($_SESSION['apple_music']);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MAaN - Music Analyzer and Notifier</title>
-  <style>
-    body     { margin: 0; font-family: Arial, sans-serif; background: #f6f6f4; }
-    nav      { padding: 15px 25px; background: #1a1a1a; }
-    nav a    { color: white; text-decoration: none; margin-right: 20px; }
-    main     { max-width: 500px; margin: 50px auto; padding: 0 15px; text-align: center; }
-    .btn     { display: block; padding: 15px; margin: 12px 0; border-radius: 8px;
-               font-size: 18px; font-weight: bold; text-decoration: none; }
-    .spotify { background: #1DB954; color: black; }
-    .apple   { background: #FA243C; color: white; }
-    .error   { padding: 10px; border-radius: 6px; background: #fde8e8; color: #8a1c1c; }
-    .success { padding: 10px; border-radius: 6px; background: #e6f2ea; color: #1d5c2e; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Analyzer and Notifier</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-  <nav>
-    <a href="index.php">Home</a>
-    <a href="information.php">Information</a>
-    <a href="contact.php">Contact</a>
-  </nav>
+    <header class="topbar">
+        <span class="brand">Music Analyzer</span>
 
-  <main>
-    <h1>Music Analyzer and Notifier</h1>
-    <p>Choose your streaming service:</p>
+        <nav>
+            <a href="index.php" aria-current="page">Home</a>
+            <a href="information.html">Information</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
 
-    <?php if ($error): ?>
-      <p class="error"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+    <main>
 
-    <?php if ($spotifyConnected): ?>
-    <p class="success">
-        Spotify Connected
-    </p>
-    <?php endif; ?>
+        <section class="panel">
 
-    <?php if ($appleConnected): ?>
-    <p class="success">
-        Apple Music Connected
-    </p>
-    <?php endif; ?>
+            <div class="title">
+                <h1>Music Analyzer and Notifier</h1>
+                <p>
+                    Connect your music streaming account to analyze your listening habits,
+                    favorite artists, top songs, and albums.
+                </p>
+            </div>
 
-    <a class="btn spotify" href="login.php">Continue with Spotify</a>
-    <a class="btn apple" href="apple_login.php">Continue with Apple Music</a>
-  </main>
+            <?php if ($error): ?>
+                <p class="error">
+                    <?= htmlspecialchars($error) ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($spotifyConnected): ?>
+                <p class="success">
+                    ✓ Spotify Connected
+                </p>
+            <?php endif; ?>
+
+            <?php if ($appleConnected): ?>
+                <p class="success">
+                    ✓ Apple Music Connected
+                </p>
+            <?php endif; ?>
+
+            <div class="services">
+
+                <a href="login.php"
+                   class="service spotify"
+                   style="--accent:#1DB954;">
+
+                    <span class="dot"></span>
+
+                    Spotify
+
+                    <small>
+                        Connect your Spotify account and view your top songs, artists, and albums.
+                    </small>
+
+                </a>
+
+                <a href="apple_login.php"
+                   class="service apple"
+                   style="--accent:#FA243C;">
+
+                    <span class="dot"></span>
+
+                    Apple Music
+
+                    <small>
+                        Connect your Apple Music account and analyze your listening trends.
+                    </small>
+
+                </a>
+
+            </div>
+
+            <p class="notice">
+                Your music data is used only for analysis and notification features.
+                <strong>No streaming service passwords are stored.</strong>
+            </p>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <span>SE 353 01 : Software Engineering</span>
+        <span>Group : Sego, Upton, Fisher</span>
+    </footer>
 
 </body>
+
 </html>
